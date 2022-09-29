@@ -3,7 +3,7 @@
 use Illuminate\Http\Response;
 
     function json($status, $message, $data = null, $url = null) {
-        return Response::json( array(
+        return response()->json( array(
             'status' => $status,
             'message' => $message,
             'data' => $data,

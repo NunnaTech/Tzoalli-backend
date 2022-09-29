@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePedidosTable extends Migration
+class CreateGrocersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreatePedidosTable extends Migration
      */
     public function up()
     {
-        Schema::create('pedidos', function (Blueprint $table) {
+        Schema::create('grocers', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 100);
-            $table->string('direccion', 100);
-            $table->integer('total');
+            $table->string('grocer_name', 100);
+            $table->string('address', 100);
+            $table->string('zip_code', 20);
+
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ class CreatePedidosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pedidos');
+        Schema::dropIfExists('grocers');
     }
 }

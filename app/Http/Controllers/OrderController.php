@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
-use App\Models\Establecimiento;
-use Illuminate\Http\Exception;
 
-
-class EstablecimientoController extends Controller
+class OrderController extends Controller
 {
     public function index()
     {
         try {
+            $orders = Order::with('users')->get();
+            
+            return json( 0, "Listado", json_decode( $orders ) );
 
-            $establecimientos = Establecimiento::all();
-
-            return json( 0, "Listado", json_decode( $establecimientos ) );
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
@@ -40,12 +38,16 @@ class EstablecimientoController extends Controller
     public function store(Request $request)
     {
         try {
-            $establecimiento = new Establecimiento();
-            $establecimiento->nombre = $request->nombre;
-            $establecimiento->direccion = $request->direccion;
-            $establecimiento->save();
+            $order = new Order();
+            $order->order_date = $request->order_date;
+            $order->delivery_date = $request->delivery_date;
+            $order->quantity = $request->quantity;
+            $order->grocer_id = $request->grocer_id;
+            $order->user_id = $request->user_id;
 
-            return json( 0, "Guardado", json_decode( $establecimiento ) );
+            $order->save();
+
+            return json( 0, "Guardado", json_decode( $order ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -81,16 +83,21 @@ class EstablecimientoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update($id,Request $request)
+    public function update(Request $request)
     {
         try {
-            $establecimiento = Establecimiento::findOrFail($id);
-            $establecimiento->nombre = $request->nombre;
-            $establecimiento->direccion = $request->direccion;
 
-            $establecimiento->save();
+            $order = Order::findOrFail($request->id);
 
-            return json( 0, "Actualizado", json_decode( $establecimiento ) );
+            $order->order_date = $request->order_date;
+            $order->delivery_date = $request->delivery_date;
+            $order->quantity = $request->quantity;
+            $order->grocer_id = $request->grocer_id;
+            $order->user_id = $request->user_id;
+
+            $order->save();
+
+            return json( 0, "Actualizado", json_decode( $order ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -103,12 +110,12 @@ class EstablecimientoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
         try {
 
-            $establecimiento = Establecimiento::destroy($id);
-            return json( 0, "Borrado",);
+            $order = Order::destroy($request->id);
+            return json( 1, "Borrado",);
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );

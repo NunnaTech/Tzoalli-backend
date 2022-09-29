@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Models\Observacion;
 
-
-class ObservacionController extends Controller
+class ProductController extends Controller
 {
     public function index()
     {
         try {
-            $observaciones = Observacion::all();
-            return $observaciones;
+
+            $products = Product::all();
+
+            return json( 0, "Listado", json_decode( $products ) );
+
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
@@ -37,12 +39,12 @@ class ObservacionController extends Controller
     public function store(Request $request)
     {
         try {
-            $observacion = new Observacion();
-            $observacion->descripcion = $request->descripcion;
-            $observacion->precio = $request->precio;
-            $observacion->stock = $request->stock;
 
-            $observacion->save();
+            $product = new Product();
+            $product->product_name = $request->product_name;
+            $product->save();
+            
+            return json( 0, "Guardado", json_decode( $product ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -82,18 +84,18 @@ class ObservacionController extends Controller
     {
         try {
 
-            $observacion = Observacion::findOrFail($request->id);
-            $observacion->descripcion = $request->descripcion;
-            $observacion->precio = $request->precio;
-            $observacion->stock = $request->stock;
+            $product = Product::findOrFail($request->id);
+            $product->product_name = $request->product_name;
 
-            $observacion->save();
+            $product->save();
+            return json( 0, "Actualizado", json_decode( $product ) );
 
-            return $observacion;
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
+
+        return $product;
     }
 
     /**
@@ -106,8 +108,8 @@ class ObservacionController extends Controller
     {
         try {
 
-            $observacion = Observacion::destroy($request->id);
-            return $observacion;
+            $product = Product::destroy($request->id);
+            return json( 1, "Borrado",);
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );

@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrderDetail;
 use Illuminate\Http\Request;
-use App\Models\Producto;
 
-class ProductoController extends Controller
+class OrderDetailController extends Controller
 {
     public function index()
     {
         try {
+            $orderDetails = OrderDetail::all();
 
-            $productos = Producto::all();
-            return $productos;
+            return json( 1, "Listado", json_decode( $orderDetails ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -38,13 +38,12 @@ class ProductoController extends Controller
     public function store(Request $request)
     {
         try {
+            $orderDetail = new OrderDetail();
+            $orderDetail->id_product = $request->id_product;
+            $orderDetail->quantity = $request->quantity;
+            $orderDetail->save();
 
-            $producto = new Producto();
-            $producto->descripcion = $request->descripcion;
-            $producto->precio = $request->precio;
-            $producto->stock = $request->stock;
-
-            $producto->save();
+            return json( 0, "Guardado", json_decode( $orderDetail ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -84,18 +83,16 @@ class ProductoController extends Controller
     {
         try {
 
-            $producto = Producto::findOrFail($request->id);
-            $producto->descripcion = $request->descripcion;
-            $producto->precio = $request->precio;
-            $producto->stock = $request->stock;
+            $orderDetail = OrderDetail::findOrFail($request->id);
+            $orderDetail->id_product = $request->id_product;
+            $orderDetail->quantity = $request->quantity;
+            $orderDetail->save();
 
-            $producto->save();
+            return json( 0, "Actualizado", json_decode( $orderDetail ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
-
-        return $producto;
     }
 
     /**
@@ -108,8 +105,8 @@ class ProductoController extends Controller
     {
         try {
 
-            $producto = Producto::destroy($request->id);
-            return $producto;
+            $orderDetail = OrderDetail::destroy($request->id);
+            return json( 1, "Borrado",);
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );

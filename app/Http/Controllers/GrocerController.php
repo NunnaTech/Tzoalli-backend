@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Grocer;
 use Illuminate\Http\Request;
-use App\Models\Estante;
 
-class EstanteController extends Controller
+class GrocerController extends Controller
 {
     public function index()
     {
         try {
-
-            $estantes = Estante::all();
-
-            return json( 0, "Listado", json_decode( $estantes ) );
+            $grocers = Grocer::all();
+            return json( 0, "Listado", json_decode( $grocers ) );
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
@@ -37,17 +35,14 @@ class EstanteController extends Controller
      */
     public function store(Request $request)
     {
-
         try {
+            $grocer = new Grocer();
+            $grocer->grocer_name = $request->grocer_name;
+            $grocer->address = $request->address;
+            $grocer->zip_code = $request->zip_code;
+            $grocer->save();
 
-            $estante = new Estante();
-            $estante->descripcion = $request->descripcion;
-            $estante->precio = $request->precio;
-            $estante->stock = $request->stock;
-
-            $estante->save();
-
-            return json( 0, "Guardado", json_decode( $estante ) );
+            return json( 0, "Guardado", json_decode( $grocer ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -83,18 +78,18 @@ class EstanteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update($id,Request $request)
     {
         try {
+            $grocer = Grocer::findOrFail($id);
 
-            $estante = Estante::findOrFail($request->id);
-            $estante->descripcion = $request->descripcion;
-            $estante->precio = $request->precio;
-            $estante->stock = $request->stock;
+            $grocer->grocer_name = $request->grocer_name;
+            $grocer->address = $request->address;
+            $grocer->zip_code = $request->zip_code;
 
-            $estante->save();
+            $grocer->save();
 
-            return json( 0, "Actualizado", json_decode( $estante ) );
+            return json( 0, "Actualizado", json_decode( $grocer ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -107,12 +102,12 @@ class EstanteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function destroy($id)
     {
         try {
 
-            $estante = Estante::destroy($request->id);
-            return $estante;
+            $grocer = Grocer::destroy($id);
+            return json( 1, "Borrado",);
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );

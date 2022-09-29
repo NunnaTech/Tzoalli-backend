@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Models\Pedido;
 
-class PedidioController extends Controller
+class UserController extends Controller
 {
     public function index()
     {
-        $pedidos = Pedido::all();
-        return $pedidos;
+        try {
+
+            $users = User::all();
+
+            return json( 0, "Listado", json_decode( $users ) );
+
+        } catch (\Exception $e) {
+            return json( 0, $e->getMessage() );
+        }
     }
 
     /**
@@ -33,12 +40,17 @@ class PedidioController extends Controller
     {
         try {
 
-            $pedido = new Pedido();
-            $pedido->descripcion = $request->descripcion;
-            $pedido->precio = $request->precio;
-            $pedido->stock = $request->stock;
+            $user = new User();
+            $user->name = $request->name;
+            $user->second_name = $request->second_name;
+            $user->last_name = $request->last_name;
 
-            $pedido->save();
+            $user->email = $request->email;
+            $user->password = $request->password;
+            $user->is_Admin = $request->is_Admin;
+            $user->save();
+
+            return json( 0, "Guardado", json_decode( $user ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -78,18 +90,23 @@ class PedidioController extends Controller
     {
         try {
 
-            $pedido = Pedido::findOrFail($request->id);
-            $pedido->descripcion = $request->descripcion;
-            $pedido->precio = $request->precio;
-            $pedido->stock = $request->stock;
+            $user = User::findOrFail($request->id);
+            $user->name = $request->name;
+            $user->second_name = $request->second_name;
+            $user->last_name = $request->last_name;
 
-            $pedido->save();
+            $user->email = $request->email;
+            $user->password = $request->password;
+            $user->is_Admin = $request->is_Admin;
 
-            return $pedido;
+            $user->save();
+            return json( 0, "Actualizado", json_decode( $user ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
+
+        return $user;
     }
 
     /**
@@ -102,8 +119,8 @@ class PedidioController extends Controller
     {
         try {
 
-            $pedido = Pedido::destroy($request->id);
-            return $pedido;
+            $user = User::destroy($request->id);
+            return json( 1, "Borrado",);
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
