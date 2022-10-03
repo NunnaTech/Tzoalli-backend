@@ -115,11 +115,11 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function destroy($id)
     {
         try {
 
-            $user = User::destroy($request->id);
+            $user = User::destroy($id);
             return json( 1, "Borrado",);
 
         } catch (\Exception $e) {

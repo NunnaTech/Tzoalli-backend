@@ -110,11 +110,11 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function destroy($id)
     {
         try {
 
-            $order = Order::destroy($request->id);
+            $order = Order::destroy($id);
             return json( 1, "Borrado",);
 
         } catch (\Exception $e) {
