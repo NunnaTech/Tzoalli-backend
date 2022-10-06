@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Models\Evidence;
 
-class OrderController extends Controller
+class EvidenceController extends Controller
 {
     public function index()
     {
         try {
-            $orders = Order::with('users')->get();
-            
-            return json( 0, "Listado", json_decode( $orders ) );
-
+            $evidences = Evidence::all();
+            return json( 0, "Listado", json_decode( $evidences ) );
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
@@ -38,16 +36,12 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         try {
-            $order = new Order();
-            $order->order_date = $request->order_date;
-            $order->delivery_date = $request->delivery_date;
-            $order->quantity = $request->quantity;
-            $order->grocer_id = $request->grocer_id;
-            $order->user_id = $request->user_id;
+            $evidence = new Evidence();
+            $evidence->evidence_url = $request->evidence_url;
+            $evidence->observation_id = $request->observation_id;
+            $evidence->save();
 
-            $order->save();
-
-            return json( 0, "Guardado", json_decode( $order ) );
+            return json( 0, "Guardado", json_decode( $evidence ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -60,12 +54,12 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+    public function show(Evidence $evidence)
     {
         return [
             "status" => true,
             "message" => "Consulta unica",
-            "data" => $order
+            "data" => $evidence
         ];
     }
 
@@ -87,21 +81,22 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update($id,Request $request)
     {
         try {
+             
+            if (!Evidence::find($id)) {
+                return json( 0, "No existe!!",);
+            }
+            
+            $evidence = Evidence::findOrFail($id);
 
-            $order = Order::findOrFail($request->id);
+            $evidence->evidence_url = $request->evidence_url;
+            $evidence->observation_id = $request->observation_id;
 
-            $order->order_date = $request->order_date;
-            $order->delivery_date = $request->delivery_date;
-            $order->quantity = $request->quantity;
-            $order->grocer_id = $request->grocer_id;
-            $order->user_id = $request->user_id;
+            $evidence->save();
 
-            $order->save();
-
-            return json( 0, "Actualizado", json_decode( $order ) );
+            return json( 0, "Actualizado", json_decode( $evidence ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -117,13 +112,16 @@ class OrderController extends Controller
     public function destroy($id)
     {
         try {
+            
+            if (!Evidence::find($id)) {
+                return json( 0, "No existe!!",);
+            }
 
-            $order = Order::destroy($id);
+            $evidence = Evidence::destroy($id);
             return json( 1, "Borrado",);
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
     }
-
 }

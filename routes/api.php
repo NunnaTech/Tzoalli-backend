@@ -27,3 +27,7 @@ Route::resource('order', App\Http\Controllers\OrderController::class)->only(['in
 Route::resource('orderDetail', App\Http\Controllers\OrderDetailController::class)->only(['index','store','update','show','destroy']);
 
 Route::resource('product', App\Http\Controllers\ProductController::class)->only(['index','store','update','show','destroy']);
+
+Route::resource('evidence', App\Http\Controllers\EvidenceController::class)->only(['index','store','update','show','destroy']);
+
+Route::resource('observation', App\Http\Controllers\ObservationController::class)->only(['index','store','update','show','destroy']);
