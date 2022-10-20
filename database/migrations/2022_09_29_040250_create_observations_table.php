@@ -15,7 +15,10 @@ class CreateObservationsTable extends Migration
     {
         Schema::create('observations', function (Blueprint $table) {
             $table->id();
+            $table->string('title', 100);
             $table->string('comment', 255);
+            $table->unsignedBigInteger('visit_id');
+            $table->foreign('visit_id')->references('id')->on('visits');
             $table->timestamps();
         });
     }

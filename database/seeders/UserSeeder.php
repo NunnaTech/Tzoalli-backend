@@ -18,12 +18,13 @@ class UserSeeder extends Seeder
    {
         $data = [
             [
-            'name' => 'Leonardo',
-            'second_name' => 'Cantoran',
-            'last_name' => 'Molina',
-            'email' => 'Leonardo@gmail.com',
-            'password' => 'secret',
-            'is_Admin' => '1',
+                'name' => 'Leonardo',
+                'second_name' => 'Cantoran',
+                'last_name' => 'Molina',
+                'email' => 'Leonardo@gmail.com',
+                'password' => 'secret',
+                'is_Admin' => '1',
+                'phone' => '7773308855',
             ],
             [
                 'name' => 'Jair',
@@ -32,6 +33,7 @@ class UserSeeder extends Seeder
                 'email' => 'jair@gmail.com',
                 'password' => 'secret',
                 'is_Admin' => '1',
+                'phone' => '7773308855',
             ],
             [
                 'name' => 'Raul',
@@ -39,7 +41,8 @@ class UserSeeder extends Seeder
                 'last_name' => 'Najera',
                 'email' => 'raul@gmail.com',
                 'password' => 'secret',
-                'is_Admin' => '1',
+                'is_Admin' => '0',
+                'phone' => '7773308855',
             ],
             [
                 'name' => 'Esmeralda',
@@ -47,7 +50,8 @@ class UserSeeder extends Seeder
                 'last_name' => 'Arroyo',
                 'email' => 'esme@gmail.com',
                 'password' => 'secret',
-                'is_Admin' => '1',
+                'is_Admin' => '0',
+                'phone' => '7773308855',
             ],
             [
                 'name' => 'Pavel',
@@ -55,7 +59,8 @@ class UserSeeder extends Seeder
                 'last_name' => 'Ponce',
                 'email' => 'pavel@gmail.com',
                 'password' => 'secret',
-                'is_Admin' => '1',
+                'is_Admin' => '0',
+                'phone' => '7773308855',
             ], 
             [
                 'name' => 'Yami',
@@ -63,7 +68,8 @@ class UserSeeder extends Seeder
                 'last_name' => 'Ponce',
                 'email' => 'yami@gmail.com',
                 'password' => 'secret',
-                'is_Admin' => '1',
+                'is_Admin' => '0',
+                'phone' => '7773308855',
             ]
         ];
 

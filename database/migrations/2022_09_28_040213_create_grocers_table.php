@@ -15,7 +15,9 @@ class CreateGrocersTable extends Migration
     {
         Schema::create('grocers', function (Blueprint $table) {
             $table->id();
+            $table->string('owner_full_name', 200)->unique();
             $table->string('grocer_name', 100);
+            $table->string('phone', 50);
             $table->string('address', 100);
             $table->string('zip_code', 20);
 

@@ -18,36 +18,24 @@ class OrdersSeeder extends Seeder
         $data = 
         [
             [
-                'order_date' => '2022-10-01',
-                'delivery_date' => '2022-10-03',
-                'quantity' => '10',
-                'grocer_id' => '1',
-                'observation_id' => '1',
-                'user_id' => '1',
+                'received_by' => '3',
+                'status' => 'Solicitado',
+                'total_order_amount' => '2000.00',
             ],
             [
-                'order_date' => '2022-10-01',
-                'delivery_date' => '2022-10-03',
-                'quantity' => '20',
-                'grocer_id' => '1',
-                'observation_id' => '1',
-                'user_id' => '1',
+                'received_by' => '3',
+                'status' => 'En camino',
+                'total_order_amount' => '900.00',
             ],
             [
-                'order_date' => '2022-10-01',
-                'delivery_date' => '2022-10-03',
-                'quantity' => '10',
-                'grocer_id' => '2',
-                'observation_id' => '2',
-                'user_id' => '2',
+                'received_by' => '3',
+                'status' => 'En camino',
+                'total_order_amount' => '1500.00',
             ],
             [
-                'order_date' => '2022-10-01',
-                'delivery_date' => '2022-10-03',
-                'quantity' => '10',
-                'grocer_id' => '2',
-                'observation_id' => '2',
-                'user_id' => '2',
+                'received_by' => '3',
+                'status' => 'Entregado',
+                'total_order_amount' => '4000.00',
             ]
         ];
 

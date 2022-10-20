@@ -17,20 +17,28 @@ class OrderDetailSeeder extends Seeder
     {
         $data = [
             [
-                'id_product' => '1',
+                'order_id' => '1',
+                'product_id' => '1',
                 'quantity' => '10',
+                'total_amount' => '2000.00',
             ],
             [
-                'id_product' => '2',
+                'order_id' => '1',
+                'product_id' => '2',
                 'quantity' => '20',
+                'total_amount' => '1000.00',
             ],
             [
-                'id_product' => '3',
+                'order_id' => '2',
+                'product_id' => '3',
                 'quantity' => '30',
+                'total_amount' => '3500.00',
             ],
             [
-                'id_product' => '4',
+                'order_id' => '2',
+                'product_id' => '4',
                 'quantity' => '40',
+                'total_amount' => '800.00',
             ]
         ];
 

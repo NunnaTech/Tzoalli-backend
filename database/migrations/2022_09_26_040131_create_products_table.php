@@ -16,7 +16,8 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('product_name', 100);
-            //Foregin key from id_category faltante
+            $table->string('product_image');
+            $table->double('product_price', 8, 2);
             $table->timestamps();
         });
     }
