@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -22,7 +23,7 @@ class UserSeeder extends Seeder
                 'second_name' => 'Cantoran',
                 'last_name' => 'Molina',
                 'email' => 'Leonardo@gmail.com',
-                'password' => 'secret',
+                'password' => Hash::make('secret'),
                 'is_Admin' => '1',
                 'phone' => '7773308855',
             ],
@@ -31,7 +32,7 @@ class UserSeeder extends Seeder
                 'second_name' => 'Vasquez',
                 'last_name' => 'Martinez',
                 'email' => 'jair@gmail.com',
-                'password' => 'secret',
+                'password' => Hash::make('secret'),
                 'is_Admin' => '1',
                 'phone' => '7773308855',
             ],
@@ -40,7 +41,7 @@ class UserSeeder extends Seeder
                 'second_name' => 'Adame ',
                 'last_name' => 'Najera',
                 'email' => 'raul@gmail.com',
-                'password' => 'secret',
+                'password' => Hash::make('secret'),
                 'is_Admin' => '0',
                 'phone' => '7773308855',
             ],
@@ -49,7 +50,7 @@ class UserSeeder extends Seeder
                 'second_name' => 'Lara',
                 'last_name' => 'Arroyo',
                 'email' => 'esme@gmail.com',
-                'password' => 'secret',
+                'password' => Hash::make('secret'),
                 'is_Admin' => '0',
                 'phone' => '7773308855',
             ],
@@ -58,7 +59,7 @@ class UserSeeder extends Seeder
                 'second_name' => 'Molina',
                 'last_name' => 'Ponce',
                 'email' => 'pavel@gmail.com',
-                'password' => 'secret',
+                'password' => Hash::make('secret'),
                 'is_Admin' => '0',
                 'phone' => '7773308855',
             ], 
@@ -67,7 +68,7 @@ class UserSeeder extends Seeder
                 'second_name' => 'Solis',
                 'last_name' => 'Ponce',
                 'email' => 'yami@gmail.com',
-                'password' => 'secret',
+                'password' => Hash::make('secret'),
                 'is_Admin' => '0',
                 'phone' => '7773308855',
             ]

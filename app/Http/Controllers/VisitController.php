@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Visit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+Use Exception;
 
 class VisitController extends Controller
 {
@@ -14,7 +18,28 @@ class VisitController extends Controller
      */
     public function index()
     {
-        //
+        try {
+
+            $visits = Visit::paginate(10);
+
+            return $this->getResponse201("Visits","all consulted", $products);
+
+        } catch (Exception $e) {
+            return $this->getResponse500([$e->getMessage()]);
+        }
+    }
+
+    public function getMyVisits($status)
+    {
+        try {
+            $user = auth()->user();
+            $visits = Visit::where("visited_by",$user->id)->where("status",$status)->paginate(10);
+
+            return $this->getResponse201("Visits","all consulted by status '{$status}'", $visits);
+
+        } catch (Exception $e) {
+            return $this->getResponse500([$e->getMessage()]);
+        }
     }
 
     /**
@@ -35,7 +60,34 @@ class VisitController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'visited_by' => 'required',
+            'visit_date' => 'required',
+            'status' => 'required',
+            'grocer_id' => 'required',
+        ]);
+
+        if (!$validator->fails()) {
+            DB::beginTransaction();
+            try {
+                $visit = new Visit();
+                $visit->visited_by = $request->visited_by;
+                $visit->visit_date = $request->visit_date;
+                $visit->status = $request->status;
+                $visit->order_id = $request->order_id;
+                $visit->grocer_id = $request->grocer_id;
+
+                $visit->save();
+
+                DB::commit();
+                return $this->getResponse201('New visit', 'created', $visit);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
+        }
     }
 
     /**
@@ -71,7 +123,23 @@ class VisitController extends Controller
     {
         //
     }
+    
+    public function updateStatus(Request $request, $id)
+    {
+       
+        try {
 
+            $visit = Visit::findOrFail($id);
+            $visit->status = $request->status;
+
+            $visit->save();
+
+            return  $this->getResponse201('Visit status', 'update', $visit);
+
+        } catch (\Exception $e) {
+            return $this->getResponse500([$e->getMessage()]);
+        }
+    }
     /**
      * Remove the specified resource from storage.
      *

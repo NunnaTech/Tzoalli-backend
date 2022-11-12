@@ -17,7 +17,6 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('received_by')->nullable();
-            $table->enum('status', ['Solicitado', 'En camino', 'Entregado']);
             $table->double('total_order_amount', 8, 2);
             $table->timestamps();
         });

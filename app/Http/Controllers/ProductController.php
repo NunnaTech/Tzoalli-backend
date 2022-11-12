@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+Use Exception;
 
 class ProductController extends Controller
 {
@@ -11,12 +12,12 @@ class ProductController extends Controller
     {
         try {
 
-            $products = Product::all();
+            $products = Product::paginate(10);
 
-            return json( 0, "Listado", json_decode( $products ) );
+            return $this->getResponse201("Products","Consult", $products);
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+        } catch (Exception $e) {
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 
@@ -38,16 +39,27 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        try {
+        $validator = Validator::make($request->all(), [
+            'product_name' => 'required|size:2',
+            'product_image' => 'required',
+            'product_price' => 'required|regex:/^\d+(\.\d{1,2})?$/|min:0'
+        ]);
 
-            $product = new Product();
-            $product->product_name = $request->product_name;
-            $product->save();
-            
-            return json( 0, "Guardado", json_decode( $product ) );
+        if (!$validator->fails()) {
+            DB::beginTransaction();
+            try {
+                $product = new Product();
+                $product->product_name = $request->product_name;
+                $product->save();
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+                DB::commit();
+                return $this->getResponse201('user account', 'created', $user);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -57,9 +69,34 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Product $product)
     {
-        //
+        try {
+            return 
+                $this->getResponse201('Product', 'find', $product);
+        } catch (Exception $e) {
+            return 
+                $this->getResponse500([$e->getMessage()]);
+        }
+    }
+
+      /**
+     * Find by keyword
+     *
+     * @param  string  $searchValue
+     * @return \Illuminate\Http\Response
+     */
+    public function findByName(Request $request)
+    {
+        try {
+            $searchValues = $request->key;
+            $product = Product::where(function ($q) use ($searchValues) {
+                $q->orWhere('product_name', 'like', "%{$searchValues}%");
+            });
+            return $this->getResponse201('Product', 'find', $product->get());
+        } catch (Exception $e) {
+            return $this->getResponse500([$e->getMessage()]);
+        }
     }
 
     /**
@@ -88,14 +125,12 @@ class ProductController extends Controller
             $product->product_name = $request->product_name;
 
             $product->save();
-            return json( 0, "Actualizado", json_decode( $product ) );
 
+            return  $this->getResponse201('Product', 'update', $product);
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
-
-        return $product;
     }
 
     /**
@@ -109,10 +144,10 @@ class ProductController extends Controller
         try {
 
             $product = Product::destroy($id);
-            return json( 1, "Borrado",);
+            return $this->getResponseDelete200();
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 

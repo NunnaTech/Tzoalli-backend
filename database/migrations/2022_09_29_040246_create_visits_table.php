@@ -17,7 +17,7 @@ class CreateVisitsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('visited_by');
             $table->date('visit_date');
-            $table->boolean('status')->default(false);
+            $table->enum('status', ['Pendiente', 'En camino', 'Realizado']);
             $table->unsignedBigInteger('order_id')->nullable();
             $table->unsignedBigInteger('grocer_id');
 
