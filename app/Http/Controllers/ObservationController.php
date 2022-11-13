@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Models\Observation;
 
-class OrderController extends Controller
+class ObservationController extends Controller
 {
     public function index()
     {
         try {
-            $orders = Order::with('users')->get();
-            
-            return json( 0, "Listado", json_decode( $orders ) );
-
+            $observations = Observation::all();
+            return json( 0, "Listado", json_decode( $observations ) );
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
@@ -38,16 +36,11 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         try {
-            $order = new Order();
-            $order->order_date = $request->order_date;
-            $order->delivery_date = $request->delivery_date;
-            $order->quantity = $request->quantity;
-            $order->grocer_id = $request->grocer_id;
-            $order->user_id = $request->user_id;
+            $observation = new Observation();
+            $observation->comment = $request->comment;
+            $observation->save();
 
-            $order->save();
-
-            return json( 0, "Guardado", json_decode( $order ) );
+            return json( 0, "Guardado", json_decode( $observation ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -60,12 +53,12 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+    public function show(Observation $observation)
     {
         return [
             "status" => true,
             "message" => "Consulta unica",
-            "data" => $order
+            "data" => $observation
         ];
     }
 
@@ -87,21 +80,21 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update($id,Request $request)
     {
         try {
+             
+            if (!Observation::find($id)) {
+                return json( 0, "No existe!!",);
+            }
+            
+            $observation = Observation::findOrFail($id);
 
-            $order = Order::findOrFail($request->id);
+            $observation->comment = $request->comment;
 
-            $order->order_date = $request->order_date;
-            $order->delivery_date = $request->delivery_date;
-            $order->quantity = $request->quantity;
-            $order->grocer_id = $request->grocer_id;
-            $order->user_id = $request->user_id;
+            $observation->save();
 
-            $order->save();
-
-            return json( 0, "Actualizado", json_decode( $order ) );
+            return json( 0, "Actualizado", json_decode( $observation ) );
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
@@ -117,13 +110,16 @@ class OrderController extends Controller
     public function destroy($id)
     {
         try {
+            
+            if (!Observation::find($id)) {
+                return json( 0, "No existe!!",);
+            }
 
-            $order = Order::destroy($id);
+            $observation = Observation::destroy($id);
             return json( 1, "Borrado",);
 
         } catch (\Exception $e) {
             return json( 0, $e->getMessage() );
         }
     }
-
 }

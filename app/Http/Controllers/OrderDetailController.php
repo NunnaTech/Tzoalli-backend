@@ -101,11 +101,11 @@ class OrderDetailController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function destroy($id)
     {
         try {
 
-            $orderDetail = OrderDetail::destroy($request->id);
+            $orderDetail = OrderDetail::destroy($id);
             return json( 1, "Borrado",);
 
         } catch (\Exception $e) {

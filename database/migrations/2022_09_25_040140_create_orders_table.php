@@ -13,18 +13,11 @@ class CreateOrdersTable extends Migration
      */
     public function up()
     {
+        //  [solicitado,en camino, entregado]
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->date('order_date');
-            $table->date('delivery_date');
-            $table->integer('quantity');
-
-            //foregin key
-            $table->unsignedBigInteger('grocer_id');
-            $table->foreign('grocer_id')->references('id')->on('grocers');
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
-
+            $table->string('received_by')->nullable();
+            $table->double('total_order_amount', 8, 2);
             $table->timestamps();
         });
     }
