@@ -38,7 +38,9 @@ class VisitController extends Controller
             }])->with(['grocer' => function ($query) {
                 $query->select('id', 'owner_full_name', 'grocer_name', 'address', 'phone', 'zip_code');
             }])->with(['order' => function ($query) {
-                $query->with('products');
+                $query->with(['details' => function ($query) {
+                    $query->with('product');
+                }]);
             }])->where("visited_by",$user->id)->where("status",$status)->paginate(10);
 
             return $this->getResponse201("Visits","all consulted by status '{$status}'", $visits);
