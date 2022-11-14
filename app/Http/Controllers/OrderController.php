@@ -62,6 +62,15 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
+        try {
+            $order = Order::with('products')->find($order->id);
+            
+            return $this->getResponse201("Order","order detail", $order);
+
+        } catch (Exception $e) {
+            return $this->getResponse500([$e->getMessage()]);
+        }
+
         return [
             "status" => true,
             "message" => "Consulta unica",

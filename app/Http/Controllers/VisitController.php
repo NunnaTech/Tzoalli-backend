@@ -37,7 +37,9 @@ class VisitController extends Controller
                 $query->select('id', 'name', 'second_name', 'last_name', 'email', 'phone');
             }])->with(['grocer' => function ($query) {
                 $query->select('id', 'owner_full_name', 'grocer_name', 'address', 'phone', 'zip_code');
-            }])->with('order')->where("visited_by",$user->id)->where("status",$status)->paginate(10);
+            }])->with(['order' => function ($query) {
+                $query->with('products');
+            }])->where("visited_by",$user->id)->where("status",$status)->paginate(10);
 
             return $this->getResponse201("Visits","all consulted by status '{$status}'", $visits);
 
@@ -134,6 +136,11 @@ class VisitController extends Controller
         try {
 
             $visit = Visit::findOrFail($id);
+
+            if($visit->visited_by != auth()->user()->id){
+                return $this->getResponse403();
+            }
+
             $visit->status = $request->status;
 
             $visit->save();
