@@ -34,7 +34,7 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']); //header content type, Accept
 
 //Authentication is required for these endpoints (apply middleware auth:sanctum)
-Route::group(['middleware' => ["auth:sanctum"]], function () {
+Route::group(['middleware' => ["auth:sanctum", "cors"]], function () {
     Route::get('userProfile', [AuthController::class, 'userProfile']);
     Route::get('logout', [AuthController::class, 'logout']);
     Route::put('changePassword', [AuthController::class, 'changePassword']);
