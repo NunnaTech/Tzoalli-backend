@@ -37,20 +37,33 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $order = new Order();
-            $order->order_date = $request->order_date;
-            $order->delivery_date = $request->delivery_date;
-            $order->quantity = $request->quantity;
-            $order->grocer_id = $request->grocer_id;
-            $order->user_id = $request->user_id;
+        
+        $validator = Validator::make($request->all(), [
+            'received_by' => 'required',
+            'total_order_amount' => 'required',    
+            'products' => 'required',            
+        ]);
 
-            $order->save();
+        if (!$validator->fails()) {
+            DB::beginTransaction();
 
-            return json( 0, "Guardado", json_decode( $order ) );
+            try {
+                $order = new Order();
+                $order->received_by = $request->received_by;
+                $order->total_order_amount = $request->total_order_amount;
+                foreach($request->products as $item){
+                    $order->products()->attach($item);
+                }
+                $order->save();
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+                DB::commit();
+                return $this->getResponse201('New Order', 'created', $visit);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -63,19 +76,15 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         try {
-            $order = Order::with('products')->find($order->id);
+            $order = Order::with(['details' => function ($query) {
+                $query->select('id','product_id','order_id','quantity','total_amount')->with('product');
+            }])->find($order->id);
             
             return $this->getResponse201("Order","order detail", $order);
 
         } catch (Exception $e) {
             return $this->getResponse500([$e->getMessage()]);
         }
-
-        return [
-            "status" => true,
-            "message" => "Consulta unica",
-            "data" => $order
-        ];
     }
 
     /**
