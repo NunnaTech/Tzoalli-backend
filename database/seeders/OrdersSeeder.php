@@ -18,19 +18,19 @@ class OrdersSeeder extends Seeder
         $data = 
         [
             [
-                'received_by' => '3',
+                'received_by' => 'Bouchra Julian',
                 'total_order_amount' => '2000.00',
             ],
             [
-                'received_by' => '3',
+                'received_by' => 'Bouchra Julian',
                 'total_order_amount' => '900.00',
             ],
             [
-                'received_by' => '3',
+                'received_by' => 'Sergio Gracia',
                 'total_order_amount' => '1500.00',
             ],
             [
-                'received_by' => '3',
+                'received_by' => 'Sergio Gracia',
                 'total_order_amount' => '4000.00',
             ]
         ];

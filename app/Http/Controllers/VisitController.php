@@ -33,7 +33,11 @@ class VisitController extends Controller
     {
         try {
             $user = auth()->user();
-            $visits = Visit::where("visited_by",$user->id)->where("status",$status)->paginate(10);
+            $visits = Visit::with(['visited_by' => function ($query) {
+                $query->select('id', 'name', 'second_name', 'last_name', 'email', 'phone');
+            }])->with(['grocer' => function ($query) {
+                $query->select('id', 'owner_full_name', 'grocer_name', 'address', 'phone', 'zip_code');
+            }])->with('order')->where("visited_by",$user->id)->where("status",$status)->paginate(10);
 
             return $this->getResponse201("Visits","all consulted by status '{$status}'", $visits);
 
