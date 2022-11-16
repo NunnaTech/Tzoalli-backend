@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -48,16 +53,26 @@ class OrderController extends Controller
             DB::beginTransaction();
 
             try {
+                $total = 0;
+                foreach($request->products as $item){
+                    $product = Product::find($item['product_id']);
+                    $total += $product->product_price * $item['quantity'];
+                }
+
                 $order = new Order();
                 $order->received_by = $request->received_by;
-                $order->total_order_amount = $request->total_order_amount;
-                foreach($request->products as $item){
-                    $order->products()->attach($item);
-                }
+                $order->total_order_amount = $total;
                 $order->save();
+                $sync_data = [];
+
+                foreach($request->products as $key => $item){
+                   $sync_data[$key] = ['product_id' => $item['product_id'], 'quantity' => $item['quantity'], 'total_amount' =>  $item['total_amount']];
+                }
+
+                $order->products()->sync($sync_data);
 
                 DB::commit();
-                return $this->getResponse201('New Order', 'created', $visit);
+                return $this->getResponse201('New Order', 'created', $order);
             } catch (Exception $e) {
                 DB::rollBack();
                 return $this->getResponse500([$e->getMessage()]);
