@@ -86,12 +86,11 @@ class ProductController extends Controller
      * @param  string  $searchValue
      * @return \Illuminate\Http\Response
      */
-    public function findByName(Request $request)
+    public function findByName($searchValue)
     {
         try {
-            $searchValues = $request->key;
-            $product = Product::where(function ($q) use ($searchValues) {
-                $q->orWhere('product_name', 'like', "%{$searchValues}%");
+            $product = Product::where(function ($q) use ($searchValue) {
+                $q->orWhere('product_name', 'like', "%{$searchValue}%");
             });
             return $this->getResponse201('Product', 'find', $product->get());
         } catch (Exception $e) {

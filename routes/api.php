@@ -40,7 +40,7 @@ Route::group(['middleware' => ["auth:sanctum", "cors"]], function () {
     Route::put('changePassword', [AuthController::class, 'changePassword']);
 
 
-    Route::get('product/findByName', [ProductController::class, 'findByName']);
+    Route::get('product/findByName/{searchValue}', [ProductController::class, 'findByName']);
     Route::get('visit/getMyVisits/{status}', [VisitController::class, 'getMyVisits']);
     Route::put('visit/updateStatus/{id}', [VisitController::class, 'updateStatus']);
 
