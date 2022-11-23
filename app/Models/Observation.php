@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Observation extends Model
 {
     use HasFactory;
+
+    public function evidences()
+    {
+        return $this->hasMany(Evidence::class);
+    }
 }

@@ -9,4 +9,9 @@ class Evidence extends Model
 {
     protected $table = 'evidences';
     use HasFactory;
+
+    public function observation()
+    {
+        return $this->belongsTo(Observation::class);
+    }
 }

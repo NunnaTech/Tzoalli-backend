@@ -43,6 +43,7 @@ Route::group(['middleware' => ["auth:sanctum", "cors"]], function () {
     Route::get('product/findByName/{searchValue}', [ProductController::class, 'findByName']);
     Route::get('visit/getMyVisits/{status}', [VisitController::class, 'getMyVisits']);
     Route::put('visit/updateStatus/{id}', [VisitController::class, 'updateStatus']);
+    Route::get('observation/getAllByVisit/{idVisit}', [ObservationController::class, 'getAllByVisit']);
 
     
     Route::resource('user', App\Http\Controllers\UserController::class)->only(['index','store','update','show','destroy']);

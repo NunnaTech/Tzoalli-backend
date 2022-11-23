@@ -4,16 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Observation;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Exception;
+use Illuminate\Support\Facades\Log;
+use App\Models\Evidence;
 
 class ObservationController extends Controller
 {
     public function index()
     {
         try {
-            $observations = Observation::all();
-            return json( 0, "Listado", json_decode( $observations ) );
+            $observations = Observation::with('evidences')->get();
+            return $this->getResponse201('Observations', 'consult', $observations);
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -35,15 +40,37 @@ class ObservationController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $observation = new Observation();
-            $observation->comment = $request->comment;
-            $observation->save();
 
-            return json( 0, "Guardado", json_decode( $observation ) );
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'comment' => 'required',    
+            'visit' => 'required',            
+        ]);
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+        if (!$validator->fails()) {
+            DB::beginTransaction();
+
+            try {
+                $observation = new Observation();
+                $observation->title = $request->title;
+                $observation->comment = $request->comment;
+                $observation->visit_id = $request->visit['id'];
+                $observation->save();
+
+                foreach ($request->urls as $url){
+                    $evidence = new Evidence;
+                    $evidence->evidence_url = $url;
+                    $post = $observation->evidences()->save($evidence);
+                }
+
+                DB::commit();
+                return $this->getResponse201('New Observation', 'created', $observation);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -80,24 +107,37 @@ class ObservationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update($id,Request $request)
+    public function update($id, Request $request)
     {
-        try {
-             
-            if (!Observation::find($id)) {
-                return json( 0, "No existe!!",);
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'comment' => 'required',    
+        ]);
+
+        if (!$validator->fails()) {
+            DB::beginTransaction();
+
+            try {
+                
+                if (!Observation::find($id)) {
+                    return json( 0, "No existe!!",);
+                }
+                
+                $observation = Observation::findOrFail($id);
+
+                $observation->title = $request->title;
+                $observation->comment = $request->comment;
+
+                $observation->save();
+
+                return $this->getResponse201('Observation', 'update', $observation);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
             }
-            
-            $observation = Observation::findOrFail($id);
-
-            $observation->comment = $request->comment;
-
-            $observation->save();
-
-            return json( 0, "Actualizado", json_decode( $observation ) );
-
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -112,14 +152,34 @@ class ObservationController extends Controller
         try {
             
             if (!Observation::find($id)) {
-                return json( 0, "No existe!!",);
+                return $this->getResponse404("No existe!!",);
             }
 
             $observation = Observation::destroy($id);
-            return json( 1, "Borrado",);
+            return $this->getResponseDelete200("Observations");
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+        } catch (Exception $e) {
+            return $this->getResponse500([$e->getMessage()]);
+        }
+    }
+
+    public function getAllByVisit($idVisit)
+    {
+        try {
+
+            $observations = Observation::with(['evidences' => function ($query) {
+                $query->select('observation_id', 'evidence_url');
+            }])->where('visit_id', $idVisit)->get();
+            
+
+            if (!isset($observations)) {
+                return $this->getResponse404("No existe!!",);
+            }
+
+            return $this->getResponse201("Observations","all consulted", $observations);
+
+        } catch (Exception $e) {
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 }
