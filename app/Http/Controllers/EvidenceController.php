@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Evidence;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class EvidenceController extends Controller
 {
@@ -11,9 +15,9 @@ class EvidenceController extends Controller
     {
         try {
             $evidences = Evidence::all();
-            return json( 0, "Listado", json_decode( $evidences ) );
+            return $this->getResponse201('Evidences', 'consult', $evidences);
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 
@@ -35,16 +39,29 @@ class EvidenceController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $evidence = new Evidence();
-            $evidence->evidence_url = $request->evidence_url;
-            $evidence->observation_id = $request->observation_id;
-            $evidence->save();
+        $validator = Validator::make($request->all(), [
+            'evidence_url' => 'required',
+            'observation_id' => 'required',    
+        ]);
 
-            return json( 0, "Guardado", json_decode( $evidence ) );
+        if (!$validator->fails()) {
+            DB::beginTransaction();
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            try {
+                $evidence = new Evidence();
+                $evidence->evidence_url = $request->evidence_url;
+                $evidence->observation_id = $request->observation_id;
+                $evidence->save();
+
+                DB::commit();
+                return $this->getResponse201('New Evidence', 'created', $evidence);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -83,23 +100,36 @@ class EvidenceController extends Controller
      */
     public function update($id,Request $request)
     {
-        try {
-             
-            if (!Evidence::find($id)) {
-                return json( 0, "No existe!!",);
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'comment' => 'required',    
+        ]);
+
+        if (!$validator->fails()) {
+            DB::beginTransaction();
+
+            try {
+                
+                if (!Evidence::find($id)) {
+                    return json( 0, "No existe!!",);
+                }
+                
+                $evidence = Evidence::findOrFail($id);
+
+                $evidence->evidence_url = $request->evidence_url;
+                $evidence->observation_id = $request->observation_id;
+
+                $evidence->save();
+                DB::commit();
+
+                return $this->getResponse201('Evidence', 'update', $evidence);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
             }
-            
-            $evidence = Evidence::findOrFail($id);
-
-            $evidence->evidence_url = $request->evidence_url;
-            $evidence->observation_id = $request->observation_id;
-
-            $evidence->save();
-
-            return json( 0, "Actualizado", json_decode( $evidence ) );
-
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -114,14 +144,14 @@ class EvidenceController extends Controller
         try {
             
             if (!Evidence::find($id)) {
-                return json( 0, "No existe!!",);
+                return $this->getResponse404("No existe!!",);
             }
 
             $evidence = Evidence::destroy($id);
-            return json( 1, "Borrado",);
+            return $this->getResponseDelete200("Evidence");
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 }

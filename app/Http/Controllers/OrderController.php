@@ -17,10 +17,10 @@ class OrderController extends Controller
         try {
             $orders = Order::with('users')->get();
             
-            return json( 0, "Listado", json_decode( $orders ) );
+            return $this->getResponse201('Orders', 'consult', $orders);
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 
@@ -122,22 +122,31 @@ class OrderController extends Controller
      */
     public function update(Request $request)
     {
-        try {
+        $validator = Validator::make($request->all(), [
+            'received_by' => 'required',
+            'total_order_amount' => 'required',    
+        ]);
 
-            $order = Order::findOrFail($request->id);
+        if (!$validator->fails()) {
+            DB::beginTransaction();
 
-            $order->order_date = $request->order_date;
-            $order->delivery_date = $request->delivery_date;
-            $order->quantity = $request->quantity;
-            $order->grocer_id = $request->grocer_id;
-            $order->user_id = $request->user_id;
+            try {
 
-            $order->save();
+                $order = Order::findOrFail($request->id);
 
-            return json( 0, "Actualizado", json_decode( $order ) );
+                $order->received_by = $request->received_by;
+                $order->total_order_amount = $total;
+                $order->save();
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+                DB::commit();
+                return $this->getResponse201('Order', 'update', $order);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -151,11 +160,15 @@ class OrderController extends Controller
     {
         try {
 
+            if (!Order::find($id)) {
+                return $this->getResponse404("No existe!!",);
+            }
+            
             $order = Order::destroy($id);
-            return json( 1, "Borrado",);
+            return $this->getResponseDelete200("Order");
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 

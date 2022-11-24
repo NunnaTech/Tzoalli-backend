@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -13,10 +17,10 @@ class UserController extends Controller
 
             $users = User::all();
 
-            return json( 0, "Listado", json_decode( $users ) );
+            return $this->getResponse201('Users', 'consult', $users);
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 
@@ -38,22 +42,38 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        try {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'second_name' => 'required',    
+            'last_name' => 'required',   
+            'email' => 'required',            
+            'password' => 'required',            
+            'is_Admin' => 'required',            
+        ]);
 
-            $user = new User();
-            $user->name = $request->name;
-            $user->second_name = $request->second_name;
-            $user->last_name = $request->last_name;
+        if (!$validator->fails()) {
+            DB::beginTransaction();
 
-            $user->email = $request->email;
-            $user->password = $request->password;
-            $user->is_Admin = $request->is_Admin;
-            $user->save();
+            try {
 
-            return json( 0, "Guardado", json_decode( $user ) );
+                $user = new User();
+                $user->name = $request->name;
+                $user->second_name = $request->second_name;
+                $user->last_name = $request->last_name;
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+                $user->email = $request->email;
+                $user->password = $request->password;
+                $user->is_Admin = $request->is_Admin;
+                $user->save();
+
+                DB::commit();
+                return $this->getResponse201('New User', 'created', $user);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -88,25 +108,38 @@ class UserController extends Controller
      */
     public function update(Request $request)
     {
-        try {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'second_name' => 'required',    
+            'last_name' => 'required',   
+            'email' => 'required',            
+            'password' => 'required',            
+            'is_Admin' => 'required',            
+        ]);
 
-            $user = User::findOrFail($request->id);
-            $user->name = $request->name;
-            $user->second_name = $request->second_name;
-            $user->last_name = $request->last_name;
+        if (!$validator->fails()) {
+            DB::beginTransaction();
+            try {
 
-            $user->email = $request->email;
-            $user->password = $request->password;
-            $user->is_Admin = $request->is_Admin;
+                $user = User::findOrFail($request->id);
+                $user->name = $request->name;
+                $user->second_name = $request->second_name;
+                $user->last_name = $request->last_name;
 
-            $user->save();
-            return json( 0, "Actualizado", json_decode( $user ) );
+                $user->email = $request->email;
+                $user->password = $request->password;
+                $user->is_Admin = $request->is_Admin;
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+                $user->save();
+                DB::commit();
+                return $this->getResponse201('User', 'update', $user);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
-
-        return $user;
     }
 
     /**
@@ -118,12 +151,15 @@ class UserController extends Controller
     public function destroy($id)
     {
         try {
+            if (!User::find($id)) {
+                return $this->getResponse404("No existe!!",);
+            }
 
             $user = User::destroy($id);
-            return json( 1, "Borrado",);
+            return $this->getResponseDelete200("Users");
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 

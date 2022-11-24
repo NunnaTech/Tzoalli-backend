@@ -22,7 +22,7 @@ class VisitController extends Controller
 
             $visits = Visit::paginate(10);
 
-            return $this->getResponse201("Visits","all consulted", $products);
+            return $this->getResponse201("Visits","all consulted", $visits);
 
         } catch (Exception $e) {
             return $this->getResponse500([$e->getMessage()]);
@@ -136,6 +136,7 @@ class VisitController extends Controller
     {
        
         try {
+            DB::beginTransaction();
 
             $visit = Visit::findOrFail($id);
 
@@ -146,10 +147,11 @@ class VisitController extends Controller
             $visit->status = $request->status;
 
             $visit->save();
-
+            DB::commit();
             return  $this->getResponse201('Visit status', 'update', $visit);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->getResponse500([$e->getMessage()]);
         }
     }
@@ -159,8 +161,19 @@ class VisitController extends Controller
      * @param  \App\Models\Visit  $visit
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Visit $visit)
+    public function destroy($id)
     {
-        //
+        try {
+            
+            if (!Visit::find($id)) {
+                return $this->getResponse404("No existe!!",);
+            }
+
+            $visit = Visit::destroy($id);
+            return $this->getResponseDelete200("Visit");
+
+        } catch (Exception $e) {
+            return $this->getResponse500([$e->getMessage()]);
+        }
     }
 }

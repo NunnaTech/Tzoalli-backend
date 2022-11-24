@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class OrderDetailController extends Controller
 {
@@ -12,10 +16,10 @@ class OrderDetailController extends Controller
         try {
             $orderDetails = OrderDetail::all();
 
-            return json( 1, "Listado", json_decode( $orderDetails ) );
+            return $this->getResponse201('Order details', 'consult', $orderDetails);
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 
@@ -37,16 +41,32 @@ class OrderDetailController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $orderDetail = new OrderDetail();
-            $orderDetail->id_product = $request->id_product;
-            $orderDetail->quantity = $request->quantity;
-            $orderDetail->save();
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required',
+            'order_id' => 'required',
+            'quantity' => 'required',    
+        ]);
 
-            return json( 0, "Guardado", json_decode( $orderDetail ) );
+        if (!$validator->fails()) {
+            DB::beginTransaction();
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            try {
+                $orderDetail = new OrderDetail();
+                $orderDetail->order_id = $request->order_id;
+                $orderDetail->product_id = $request->product_id;
+                $orderDetail->quantity = $request->quantity;
+                $orderDetail->total_amount = 0;
+                $orderDetail->save();
+
+                DB::commit();
+                return $this->getResponse201('Order Detail', 'created', $orderDetail);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -81,17 +101,32 @@ class OrderDetailController extends Controller
      */
     public function update(Request $request)
     {
-        try {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required',
+            'order_id' => 'required',
+            'quantity' => 'required',    
+        ]);
 
-            $orderDetail = OrderDetail::findOrFail($request->id);
-            $orderDetail->id_product = $request->id_product;
-            $orderDetail->quantity = $request->quantity;
-            $orderDetail->save();
+        if (!$validator->fails()) {
+            DB::beginTransaction();
 
-            return json( 0, "Actualizado", json_decode( $orderDetail ) );
+            try {
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+                $orderDetail = OrderDetail::findOrFail($request->id);
+                $orderDetail->id_product = $request->id_product;
+                $orderDetail->order_id = $request->order_id;
+                $orderDetail->quantity = $request->quantity;
+                $orderDetail->save();
+                
+                DB::commit();
+                return $this->getResponse201('Order detail', 'update', $orderDetail);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -105,11 +140,15 @@ class OrderDetailController extends Controller
     {
         try {
 
+            if (!OrderDetail::find($id)) {
+                return $this->getResponse404("No existe!!",);
+            }
+
             $orderDetail = OrderDetail::destroy($id);
-            return json( 1, "Borrado",);
+            return $this->getResponseDelete200("Order detail");
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 

@@ -18,7 +18,7 @@ class ObservationController extends Controller
             $observations = Observation::with('evidences')->get();
             return $this->getResponse201('Observations', 'consult', $observations);
         } catch (\Exception $e) {
-            return $this->getResponse500([$validator->errors()]);
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 
@@ -129,7 +129,8 @@ class ObservationController extends Controller
                 $observation->comment = $request->comment;
 
                 $observation->save();
-
+                DB::commit();
+                
                 return $this->getResponse201('Observation', 'update', $observation);
 
             } catch (Exception $e) {

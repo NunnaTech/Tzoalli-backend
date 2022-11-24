@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Grocer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Exception;
+use Illuminate\Support\Facades\Log;
+use App\Models\Evidence;
 
 class GrocerController extends Controller
 {
@@ -11,9 +16,9 @@ class GrocerController extends Controller
     {
         try {
             $grocers = Grocer::all();
-            return json( 0, "Listado", json_decode( $grocers ) );
+            return $this->getResponse201('Grocers', 'consult', $grocers);
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 
@@ -35,17 +40,30 @@ class GrocerController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $grocer = new Grocer();
-            $grocer->grocer_name = $request->grocer_name;
-            $grocer->address = $request->address;
-            $grocer->zip_code = $request->zip_code;
-            $grocer->save();
+        $validator = Validator::make($request->all(), [
+            'grocer_name' => 'required',
+            'address' => 'required',    
+            'zip_code' => 'required',            
+        ]);
 
-            return json( 0, "Guardado", json_decode( $grocer ) );
+        if (!$validator->fails()) {
+            DB::beginTransaction();
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            try {
+                $grocer = new Grocer();
+                $grocer->grocer_name = $request->grocer_name;
+                $grocer->address = $request->address;
+                $grocer->zip_code = $request->zip_code;
+                $grocer->save();
+
+                DB::commit();
+                return $this->getResponse201('New Grocer', 'created', $grocer);
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -80,19 +98,33 @@ class GrocerController extends Controller
      */
     public function update($id,Request $request)
     {
-        try {
-            $grocer = Grocer::findOrFail($id);
+        $validator = Validator::make($request->all(), [
+            'grocer_name' => 'required',
+            'address' => 'required',
+            'zip_code' => 'required',    
+        ]);
 
-            $grocer->grocer_name = $request->grocer_name;
-            $grocer->address = $request->address;
-            $grocer->zip_code = $request->zip_code;
+        if (!$validator->fails()) {
+            DB::beginTransaction();
 
-            $grocer->save();
+            try {
+                $grocer = Grocer::findOrFail($id);
 
-            return json( 0, "Actualizado", json_decode( $grocer ) );
+                $grocer->grocer_name = $request->grocer_name;
+                $grocer->address = $request->address;
+                $grocer->zip_code = $request->zip_code;
 
-        } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+                $grocer->save();
+                DB::commit();
+                
+                return $this->getResponse201('Grocer', 'update', $grocer);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -106,11 +138,15 @@ class GrocerController extends Controller
     {
         try {
 
+            if (!Grocer::find($id)) {
+                return $this->getResponse404("No existe!!",);
+            }
+
             $grocer = Grocer::destroy($id);
-            return json( 1, "Borrado",);
+            return $this->getResponseDelete200("Grocer");
 
         } catch (\Exception $e) {
-            return json( 0, $e->getMessage() );
+            return $this->getResponse500([$e->getMessage()]);
         }
     }
 

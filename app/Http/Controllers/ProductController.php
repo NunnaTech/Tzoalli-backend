@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-Use Exception;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -50,10 +53,12 @@ class ProductController extends Controller
             try {
                 $product = new Product();
                 $product->product_name = $request->product_name;
+                $product->product_image = $request->product_image;
+                $product->product_price = $request->product_price;
                 $product->save();
 
                 DB::commit();
-                return $this->getResponse201('user account', 'created', $user);
+                return $this->getResponse201('Product', 'created', $product);
             } catch (Exception $e) {
                 DB::rollBack();
                 return $this->getResponse500([$e->getMessage()]);
@@ -118,17 +123,32 @@ class ProductController extends Controller
      */
     public function update(Request $request)
     {
-        try {
+        $validator = Validator::make($request->all(), [
+            'product_name' => 'required|size:2',
+            'product_image' => 'required',
+            'product_price' => 'required|regex:/^\d+(\.\d{1,2})?$/|min:0'
+        ]);
 
-            $product = Product::findOrFail($request->id);
-            $product->product_name = $request->product_name;
+        if (!$validator->fails()) {
+            DB::beginTransaction();
+            try {
 
-            $product->save();
+                $product = Product::findOrFail($request->id);
+                $product->product_name = $request->product_name;
+                $product->product_image = $request->product_image;
+                $product->product_price = $request->product_price;
 
-            return  $this->getResponse201('Product', 'update', $product);
+                $product->save();
 
-        } catch (\Exception $e) {
-            return $this->getResponse500([$e->getMessage()]);
+                DB::commit();
+                return  $this->getResponse201('Product', 'update', $product);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
         }
     }
 
@@ -142,8 +162,12 @@ class ProductController extends Controller
     {
         try {
 
+            if (!Product::find($id)) {
+                return $this->getResponse404("No existe!!",);
+            }
+
             $product = Product::destroy($id);
-            return $this->getResponseDelete200();
+            return $this->getResponseDelete200("Product");
 
         } catch (\Exception $e) {
             return $this->getResponse500([$e->getMessage()]);
