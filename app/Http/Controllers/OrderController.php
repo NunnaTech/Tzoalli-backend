@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Visit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +48,7 @@ class OrderController extends Controller
             'received_by' => 'required',
             'total_order_amount' => 'required',    
             'products' => 'required',            
+            'visit_id' => 'required',            
         ]);
 
         if (!$validator->fails()) {
@@ -70,6 +72,16 @@ class OrderController extends Controller
                 }
 
                 $order->products()->sync($sync_data);
+
+                $visit = Visit::findOrFail($request->visit_id);
+
+                if($visit->visited_by != auth()->user()->id){
+                    Log::info("No existe visita propia");
+                }else{
+                    $visit->status = "En camino";
+                    $visit->order_id = $order->id;
+                    $visit->save();    
+                }
 
                 DB::commit();
                 return $this->getResponse201('New Order', 'created', $order);
