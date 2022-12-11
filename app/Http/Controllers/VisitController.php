@@ -43,6 +43,35 @@ class VisitController extends Controller
                 }]);
             }])->where("visited_by",$user->id)->where("status",$status)->paginate(10);
 
+            $getData = json_encode($visits);
+            $getData = json_Decode($getData);
+            
+            foreach ($getData->data as $key => $visit) {
+                    $result = array_reduce($visit->order->details, function($carry, $item){ 
+                    if(!isset($carry[$item->product_id])){ 
+                        $carry[$item->product_id] = [
+                                                    'product_id'=>$item->product_id,
+                                                    'order_id'=>$item->order_id,
+                                                    'quantity'=>$item->quantity,
+                                                    'total_amount'=>$item->total_amount,
+                                                    'product'=>$item->product
+                                                ]; 
+                    } else { 
+                        $carry[$item->product_id]['total_amount'] += $item->total_amount; 
+                        $carry[$item->product_id]['quantity'] += $item->quantity; 
+                    } 
+                    return $carry; 
+                });     
+                
+                $visit->order->details = [];
+
+                foreach ($result as $value) {
+                    array_push($visit->order->details, $value);
+                }
+            }
+          
+            $visits = $getData;
+
             return $this->getResponse201("Visits","all consulted by status '{$status}'", $visits);
 
         } catch (Exception $e) {
