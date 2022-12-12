@@ -43,34 +43,36 @@ class VisitController extends Controller
                 }]);
             }])->where("visited_by",$user->id)->where("status",$status)->paginate(10);
 
-            $getData = json_encode($visits);
-            $getData = json_Decode($getData);
-            
-            foreach ($getData->data as $key => $visit) {
-                    $result = array_reduce($visit->order->details, function($carry, $item){ 
-                    if(!isset($carry[$item->product_id])){ 
-                        $carry[$item->product_id] = [
-                                                    'product_id'=>$item->product_id,
-                                                    'order_id'=>$item->order_id,
-                                                    'quantity'=>$item->quantity,
-                                                    'total_amount'=>$item->total_amount,
-                                                    'product'=>$item->product
-                                                ]; 
-                    } else { 
-                        $carry[$item->product_id]['total_amount'] += $item->total_amount; 
-                        $carry[$item->product_id]['quantity'] += $item->quantity; 
-                    } 
-                    return $carry; 
-                });     
-                
-                $visit->order->details = [];
-
-                foreach ($result as $value) {
-                    array_push($visit->order->details, $value);
+                $getData = json_encode($visits);
+                $getData = json_Decode($getData);
+                foreach ($getData->data as $key => $visit) {
+                    if (isset($visit->order)) {
+                        $result = array_reduce($visit->order->details, function($carry, $item){ 
+                            if(!isset($carry[$item->product_id])){ 
+                                $carry[$item->product_id] = [
+                                                            'product_id'=>$item->product_id,
+                                                            'order_id'=>$item->order_id,
+                                                            'quantity'=>$item->quantity,
+                                                            'total_amount'=>$item->total_amount,
+                                                            'product'=>$item->product
+                                                        ]; 
+                            } else { 
+                                $carry[$item->product_id]['total_amount'] += $item->total_amount; 
+                                $carry[$item->product_id]['quantity'] += $item->quantity; 
+                            } 
+                            return $carry; 
+                        });     
+                        
+                        $visit->order->details = [];
+        
+                        foreach ($result as $value) {
+                            array_push($visit->order->details, $value);
+                        }
+                    }
                 }
-            }
-          
-            $visits = $getData;
+              
+                $visits = $getData;
+            
 
             return $this->getResponse201("Visits","all consulted by status '{$status}'", $visits);
 
@@ -119,6 +121,61 @@ class VisitController extends Controller
                 DB::commit();
                 return $this->getResponse201('New visit', 'created', $visit);
             } catch (Exception $e) {
+                DB::rollBack();
+                return $this->getResponse500([$e->getMessage()]);
+            }
+        } else {
+            return $this->getResponse500([$validator->errors()]);
+        }
+    }
+
+    public function storeVisitWithOrder(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'visited_by' => 'required',
+            'visit_date' => 'required',
+            'status' => 'required',
+            'grocer_id' => 'required',
+        ]);
+
+        if (!$validator->fails()) {
+            DB::beginTransaction();
+            try {
+                DB::beginTransaction();
+
+                $visit = Visit::findOrFail($id);
+    
+                if($visit->visited_by != auth()->user()->id){
+                    return $this->getResponse403();
+                }
+    
+                $visit->status = $request->status;
+                $visit->save();
+
+                if ( $visit->status == "En camino") {
+                    //create order    
+                    $total = 0;
+                    foreach($request->products as $item){
+                        $product = Product::find($item->product_id);
+                        $total += $product->product_price * $item->quantity;
+                    }
+    
+                    $order = new Order();
+                    $order->received_by = $request->received_by;
+                    $order->total_order_amount = $total;
+                    $order->save();
+                    $sync_data = [];
+    
+                    foreach($request->products as $key => $item){
+                       $sync_data[$key] = ['product_id' => $item->product_id, 'quantity' => $item->quantity, 'total_amount' =>  $item->total_amount];
+                    }
+    
+                    $order->products()->sync($sync_data);
+                }
+
+                DB::commit();
+                return  $this->getResponse201('Visit status', 'update', $visit);
+                } catch (Exception $e) {
                 DB::rollBack();
                 return $this->getResponse500([$e->getMessage()]);
             }
