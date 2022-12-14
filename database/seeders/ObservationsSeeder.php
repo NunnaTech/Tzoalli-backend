@@ -16,24 +16,34 @@ class ObservationsSeeder extends Seeder
     {
         $data = [
             [
-                'title' => 'Observación 1',
-                'comment' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s',
+                'title' => 'Tienda cerrada',
+                'comment' => 'se llegó a la tienda, el día 15 de diciembre por la mañana y el local estaba cerrado.',
                 'visit_id' => '1',
             ],
             [
-                'title' => 'Observación 2',
-                'comment' => 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock',
+                'title' => 'Entrega terminada',
+                'comment' => 'Se llegó a la tienda y se colocó el producto dentro de la tienda sin problema.',
                 'visit_id' => '2',
             ],
             [
-                'title' => 'Observación 3',
-                'comment' => 'discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of',
+                'title' => 'Entrega exitosa',
+                'comment' => 'La tienda recibió su pedido sin ningún inconveniente.',
                 'visit_id' => '3',
             ],
             [
-                'title' => 'Observación 4',
-                'comment' => 'The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested',
-                'visit_id' => '3',
+                'title' => 'Estantes aún con producto',
+                'comment' => 'Se llegó a la tienda y se revisó que la tienda aún no ha terminado de vender todo su producto de la última entrega.',
+                'visit_id' => '4',
+            ],
+            [
+                'title' => 'Producto caduco',
+                'comment' => 'Se revisó el producto de la entrega y se notó que uno de los paquetes tenía ya una fecha de caducidad vencida.',
+                'visit_id' => '6',
+            ],
+            [
+                'title' => 'Estante robado',
+                'comment' => 'El día de ayer se metieron a robar a la tienda y se llevaron el stand de dulces.',
+                'visit_id' => '5',
             ],
         ];
         Observation::insert($data);

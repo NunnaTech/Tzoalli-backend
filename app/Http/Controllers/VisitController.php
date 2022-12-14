@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 Use Exception;
+use Illuminate\Support\Facades\Log;
 
 class VisitController extends Controller
 {
@@ -47,26 +48,28 @@ class VisitController extends Controller
                 $getData = json_Decode($getData);
                 foreach ($getData->data as $key => $visit) {
                     if (isset($visit->order)) {
-                        $result = array_reduce($visit->order->details, function($carry, $item){ 
-                            if(!isset($carry[$item->product_id])){ 
-                                $carry[$item->product_id] = [
-                                                            'product_id'=>$item->product_id,
-                                                            'order_id'=>$item->order_id,
-                                                            'quantity'=>$item->quantity,
-                                                            'total_amount'=>$item->total_amount,
-                                                            'product'=>$item->product
-                                                        ]; 
-                            } else { 
-                                $carry[$item->product_id]['total_amount'] += $item->total_amount; 
-                                $carry[$item->product_id]['quantity'] += $item->quantity; 
-                            } 
-                            return $carry; 
-                        });     
-                        
-                        $visit->order->details = [];
-        
-                        foreach ($result as $value) {
-                            array_push($visit->order->details, $value);
+                        if (!empty($visit->order->details)) {
+                            $result = array_reduce($visit->order->details, function($carry, $item){ 
+                                if(!isset($carry[$item->product_id])){ 
+                                    $carry[$item->product_id] = [
+                                                                'product_id'=>$item->product_id,
+                                                                'order_id'=>$item->order_id,
+                                                                'quantity'=>$item->quantity,
+                                                                'total_amount'=>$item->total_amount,
+                                                                'product'=>$item->product
+                                                            ]; 
+                                } else { 
+                                    $carry[$item->product_id]['total_amount'] += $item->total_amount; 
+                                    $carry[$item->product_id]['quantity'] += $item->quantity; 
+                                } 
+                                return $carry; 
+                            });     
+                            
+                            $visit->order->details = [];
+            
+                            foreach ($result as $value) {
+                                array_push($visit->order->details, $value);
+                            }
                         }
                     }
                 }

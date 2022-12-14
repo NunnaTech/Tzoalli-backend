@@ -17,20 +17,29 @@ class EvidencesSeeder extends Seeder
         $data = [
             [
                 'observation_id' => '1',
-                'evidence_url' => 'https://firebasestorage.googleapis.com/v0/b/notes-42c80.appspot.com/o/2022-07-06%2010%3A25%3A39.599_image.jpg?alt=media&token=ae684518-8792-4b2a-8d1e-de757ec0f775',
+                'evidence_url' => 'https://szdguzpruwwvtoimdfyk.supabase.co/storage/v1/object/public/evidencias/public/cerrado.jpg',
             ],
             [
-                'observation_id' => '1',
-                'evidence_url' => 'https://firebasestorage.googleapis.com/v0/b/notes-42c80.appspot.com/o/2022-07-06%2010%3A25%3A39.599_image.jpg?alt=media&token=ae684518-8792-4b2a-8d1e-de757ec0f775',            
-            ],
-            [
-                'observation_id' => '2',
-                'evidence_url' => 'https://firebasestorage.googleapis.com/v0/b/notes-42c80.appspot.com/o/2022-07-06%2010%3A25%3A39.599_image.jpg?alt=media&token=ae684518-8792-4b2a-8d1e-de757ec0f775',            
+                'observation_id' => '6',
+                'evidence_url' => 'https://szdguzpruwwvtoimdfyk.supabase.co/storage/v1/object/public/evidencias/public/observacion1.jpg',            
             ],
             [
                 'observation_id' => '2',
-                'evidence_url' => 'https://firebasestorage.googleapis.com/v0/b/notes-42c80.appspot.com/o/2022-07-06%2010%3A25%3A39.599_image.jpg?alt=media&token=ae684518-8792-4b2a-8d1e-de757ec0f775',            
+                'evidence_url' => 'https://szdguzpruwwvtoimdfyk.supabase.co/storage/v1/object/public/evidencias/public/observacion2.jpg',            
             ],
+            [
+                'observation_id' => '3',
+                'evidence_url' => 'https://szdguzpruwwvtoimdfyk.supabase.co/storage/v1/object/public/evidencias/public/observacion3.jpg',            
+            ],
+            [
+                'observation_id' => '4',
+                'evidence_url' => 'https://szdguzpruwwvtoimdfyk.supabase.co/storage/v1/object/public/evidencias/public/robado.jpg',            
+            ],
+            [
+                'observation_id' => '5',
+                'evidence_url' => 'https://szdguzpruwwvtoimdfyk.supabase.co/storage/v1/object/public/evidencias/public/vacio.jpg',            
+            ],
+            
         ];
         Evidence::insert($data);
     }

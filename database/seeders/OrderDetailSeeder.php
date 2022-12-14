@@ -20,25 +20,67 @@ class OrderDetailSeeder extends Seeder
                 'order_id' => '1',
                 'product_id' => '1',
                 'quantity' => '10',
-                'total_amount' => '2000.00',
+                'total_amount' => '500.00',
             ],
             [
                 'order_id' => '1',
                 'product_id' => '2',
                 'quantity' => '20',
-                'total_amount' => '1000.00',
+                'total_amount' => '400.00',
             ],
             [
                 'order_id' => '2',
                 'product_id' => '3',
                 'quantity' => '30',
-                'total_amount' => '3500.00',
+                'total_amount' => '1500.00',
             ],
             [
                 'order_id' => '2',
                 'product_id' => '4',
                 'quantity' => '40',
-                'total_amount' => '800.00',
+                'total_amount' => '1200.00',
+            ],
+            [
+                'order_id' => '3',
+                'product_id' => '5',
+                'quantity' => '40',
+                'total_amount' => '4000.00',
+            ],
+            [
+                'order_id' => '3',
+                'product_id' => '6',
+                'quantity' => '40',
+                'total_amount' => '2000.00',
+            ],
+            [
+                'order_id' => '3',
+                'product_id' => '7',
+                'quantity' => '40',
+                'total_amount' => '4800.00',
+            ],
+            [
+                'order_id' => '4',
+                'product_id' => '8',
+                'quantity' => '40',
+                'total_amount' => '600.00',
+            ],
+            [
+                'order_id' => '4',
+                'product_id' => '9',
+                'quantity' => '40',
+                'total_amount' => '600.00',
+            ],
+            [
+                'order_id' => '5',
+                'product_id' => '9',
+                'quantity' => '10',
+                'total_amount' => '500.00',
+            ],
+            [
+                'order_id' => '5',
+                'product_id' => '9',
+                'quantity' => '20',
+                'total_amount' => '400.00',
             ]
         ];
 
