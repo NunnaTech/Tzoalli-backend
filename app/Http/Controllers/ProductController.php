@@ -43,7 +43,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'product_name' => 'required|size:2',
+            'product_name' => 'required|min:2',
             'product_image' => 'required',
             'product_price' => 'required|regex:/^\d+(\.\d{1,2})?$/|min:0'
         ]);

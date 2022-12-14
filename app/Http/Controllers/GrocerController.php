@@ -42,6 +42,8 @@ class GrocerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'grocer_name' => 'required',
+            'owner_full_name' => 'required',
+            'phone' => 'required',            
             'address' => 'required',    
             'zip_code' => 'required',            
         ]);
@@ -52,6 +54,8 @@ class GrocerController extends Controller
             try {
                 $grocer = new Grocer();
                 $grocer->grocer_name = $request->grocer_name;
+                $grocer->owner_full_name = $request->owner_full_name;
+                $grocer->phone = $request->phone;
                 $grocer->address = $request->address;
                 $grocer->zip_code = $request->zip_code;
                 $grocer->save();
