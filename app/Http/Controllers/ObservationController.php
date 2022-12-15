@@ -170,7 +170,7 @@ class ObservationController extends Controller
 
             $observations = Observation::with(['evidences' => function ($query) {
                 $query->select('observation_id', 'evidence_url');
-            }])->where('visit_id', $idVisit)->get();
+            }])->where('visit_id', $idVisit)->orderBy('id', 'desc')->get();
             
 
             if (!isset($observations)) {
