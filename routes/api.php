@@ -29,9 +29,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//Authentication is not required for these endpoints
-Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']); //header content type, Accept
+
+
+Route::group(['middleware' => ['cors']], function () {
+    //Authentication is not required for these endpoints
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']); //header content type, Accept
+});
+
 
 //Authentication is required for these endpoints (apply middleware auth:sanctum)
 Route::group(['middleware' => ["auth:sanctum", "cors"]], function () {
