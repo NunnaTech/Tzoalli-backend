@@ -39,6 +39,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             //\App\Http\Middleware\Cors::class,
+            \Fruitcake\Cors\HandleCors::class,
         ],
 
         'api' => [
@@ -65,6 +66,6 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        //'cors' => \App\Http\Middleware\Cors::class,
+        'cors' => \Fruitcake\Cors\HandleCors::class,,
     ];
 }
