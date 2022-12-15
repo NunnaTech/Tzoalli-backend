@@ -42,7 +42,7 @@ class VisitController extends Controller
                 $query->with(['details' => function ($query) {
                     $query->with('product');
                 }]);
-            }])->where("visited_by",$user->id)->where("status",$status)->paginate(10);
+            }])->where("visited_by",$user->id)->where("status",$status)->orderBy('id', 'desc')->paginate(10);
 
                 $getData = json_encode($visits);
                 $getData = json_Decode($getData);
